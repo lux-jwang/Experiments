@@ -1,5 +1,6 @@
-# author: jun.wang (at) uni.lu
-# We will not try improve this implementation. But if you find any bug, please feel free to contact me.
+author: jun.wang (at) uni.lu
+
+We will not try to improve this implementation. But if you find any bug, please feel free to contact me.
 #
 
 #Description
