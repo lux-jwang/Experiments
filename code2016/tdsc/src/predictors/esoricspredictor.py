@@ -33,8 +33,8 @@ class EsoricsPredictor(Predictor):
 
     def predict_by_strangers(self, user_id, item_id):
         ru  = self.model.get_user_rate_mean(user_id)
-        ts = self.contributors.get_fof_as_strangers(user_id); # use fof as stranger
-        #ts = self.contributors.get_rand_strangers(user_id)
+        #ts = self.contributors.get_fof_as_strangers(user_id); # use fof as stranger, this is for simulating decentralized version
+        ts = self.contributors.get_rand_strangers(user_id)
         tnb_delta  = self.get_delta(ts,item_id)
         pref = ru+tnb_delta
 
