@@ -28,6 +28,10 @@ We will not try to improve this implementation. But if you find any bug, please 
     
     print "8 -- Single stranger influence test on MovieLens "
     
+    print "9 -- Single friend influence without involving any stranger on 10-FMT"
+
+    print "10 -- Single friend influence without involving any stranger on MovieLens"
+    
     print "99 -- Show FMT dataset information"
 
 2  Required packages:
