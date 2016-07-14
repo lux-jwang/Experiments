@@ -4,7 +4,7 @@ We will not try to improve this implementation. But if you find any bug, please 
 #
 
 #Description
- 1. You can run.py to start the program. e.g.: "python run.py 99". This command is to show FMT dataset information. 
+1  You can run.py to start the program. e.g.: "python run.py 99". This command is to show FMT dataset information. 
     
     more details:
     
@@ -30,6 +30,6 @@ We will not try to improve this implementation. But if you find any bug, please 
     
     print "99 -- Show FMT dataset information"
 
-2. Required packages:
+2  Required packages:
    
    numpy, pickle 
