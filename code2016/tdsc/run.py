@@ -100,15 +100,13 @@ def calculate_cosine_friends_strangers(raw_data,friend_data, f_t_shape):
             print ">> mean: ", round(mean_rs,4), "; max diverse: ", round(bound,4), "; STD: ", round(mae_std,4), "; max MAE, ", round(max_mae,4), "; min MAE: ", round(min_mae,4)
     return results
 
-def single_influence(raw_data, friend_data,testfriend):
+def single_influence(raw_data, friend_data,testfriend,filename):
     if testfriend:
         f_ns = [11, 31] # randomly remove on when selecting friends
         t_n = 10
-        filename = "friend_dif_"
     else:
         f_ns = [10, 30]
         t_n = 11 # randomly remove on when selecting strangers
-        filename = "stranger_dif"
 
     ratio = 0.8
     for f_n in f_ns:
@@ -128,47 +126,71 @@ def jhk_friends(raw_data, friend_data, f_s):
        
        print ">> mean: ", round(mean_rs,4), "; max diverse: ", round(bound,4), "; STD: ", round(mae_std,4), "; max MAE, ", round(max_mae,4), "; min MAE: ", round(min_mae,4)
 
+def pure_single_friend_influence(raw_data, friend_data, filename):
+    f_ns = [6, 11,21,31,41,51]
+    t_n= 0
+    ratio = 1
+    for f_n in f_ns:
+        print "50X(5-fold CV) for friends num: ", f_n
+        esvlidation = EsoricsSingleUserValidation(5,raw_data,friend_data,f_n,t_n,ratio,True)
+        results = esvlidation.cross_validate()
+        tname = filename+str(f_n)
+        np.savetxt(tname, results, delimiter=',')
+
+
+def Pure_Friend_Influence_on_10_FMT():
+    friend_data = get_friends_data()
+    raw_data = get_user_item_matrix()
+    filename = "pure_friend_dif_10fmt_"
+    pure_single_friend_influence(raw_data,friend_data,filename)
+
+def Pure_Friend_Influence_on_MovieLens():
+    friend_data = get_friends_from_ml100k()
+    raw_data = get_moive100k()
+    filename = "pure_friend_dif_ml_"
+    pure_single_friend_influence(raw_data,friend_data,filename)
 
 def MAE_on_10_FMT():
     friend_data = get_friends_data()
     raw_data = get_user_item_matrix()
     f_ts = [(10,10),(20,10),(30,10),(40,10),(50,10)]
-    calculate_cosine_friends_strangers(raw_data, friend_data, f_ts)
-    return
+    calculate_cosine_friends_strangers(raw_data, friend_data, f_ts) 
 
 def MAE_on_MovieLens():
     friend_data = get_friends_from_ml100k()
     raw_data = get_moive100k()
     f_ts = [(10,10),(20,10),(30,10),(40,10),(50,10),(60,10),(70,10),(80,10),(90,10),(100,10)]
     calculate_cosine_friends_strangers(raw_data, friend_data, f_ts)
-    return
 
 def Single_Friend_Influence_on_10_FMT():
     friend_data = get_friends_data()
     raw_data = get_user_item_matrix()
-    single_influence(raw_data,friend_data,True)
+    filename = "friend_dif_10fmt_"
+    single_influence(raw_data,friend_data,True,filename)
 
 def Single_Friend_Influence_on_MovieLens():
     friend_data = get_friends_from_ml100k()
     raw_data = get_moive100k()
-    single_influence(raw_data,friend_data,True)
+    filename = "friend_dif_ml_"
+    single_influence(raw_data,friend_data,True,filename)
 
 def Single_Stranger_Influence_on_10_FMT():
     friend_data = get_friends_data()
     raw_data = get_user_item_matrix()
-    single_influence(raw_data,friend_data,False)
+    filename = "stranger_dif_10fmt_"
+    single_influence(raw_data,friend_data,False,filename)
 
 def Single_Stranger_Influence_on_MovieLens():
     friend_data = get_friends_from_ml100k()
     raw_data = get_moive100k()
-    single_influence(raw_data,friend_data,False)
+    filename = "friend_dif_ml_"
+    single_influence(raw_data,friend_data,False,filename)
 
 def JPH_on_10_FMT():
     f_s = [10, 20 ,30, 40, 50]
     friend_data = get_friends_data()
     raw_data = get_user_item_matrix()
     jhk_friends(raw_data, friend_data, f_s)
-
 
 def JPH_on_MovieLens():
     f_s = [20, 40 ,60, 80, 100]
@@ -183,17 +205,12 @@ def Show_Data_Info():
     print "Dataset description: >> "
     print "    1. This data set is built based on MovieTweetings dataset: https://github.com/sidooms/MovieTweetings."
     print "    2. We crawled the friends information for each user in MovieTweetings dataset since it does not have."
-
     print "    There are three files in the dataset: ratings.dat, users.dat, friends.dat."
-
-
     print "    <ratings.dat> records users' rating information on moives."
     print "    format>> user_id::movie_id::rating::rating_timesstamp"
     print "    The ratings contained in the tweets are scaled from 0 to 10."
- 
     print "    <users.dat> contains the mapping for user_id to real twitter_id."
     print "    format>> {user_id1:twitter_id1, user_id2:twitter_id2, ...}"
-
     print "    <friends.dat> contains each user's friends inforamtion (twitter_id)."
     print "    format>> {user_id1:[twitter_id9,twitter_id17,...,twitter_idn],user_id2:[twitter_id10,...],user_id3:[twitter_id100,...],...}"
 
@@ -209,7 +226,12 @@ def note():
     print "6 -- Single friend influence test on MovieLens "
     print "7 -- Single stranger influence test on 10-FMT "
     print "8 -- Single stranger influence test on MovieLens "
+    print "9 -- Single friend influence without involving any stranger on 10-FMT"
+    print "10 -- Single friend influence without involving any stranger on MovieLens"
     print "99 -- Show FMT dataset information"
+
+def nllfunc():
+    return
 
 
 
@@ -219,7 +241,7 @@ if __name__ == '__main__':
         note()
 
     else:
-        tasks = {"0": construct_data_set,
+        tasks = {"0": nllfunc, #construct_data_set
                  "1": MAE_on_10_FMT,
                  "2": MAE_on_MovieLens,
                  "3": JPH_on_10_FMT,
@@ -228,7 +250,9 @@ if __name__ == '__main__':
                  "6": Single_Friend_Influence_on_MovieLens,
                  "7": Single_Stranger_Influence_on_10_FMT,
                  "8": Single_Stranger_Influence_on_MovieLens,
-                 "99": Show_Data_Info
+                 "9": Pure_Friend_Influence_on_10_FMT,
+                 "10": Pure_Friend_Influence_on_MovieLens,
+                 "99": Show_Data_Info,
         }
 
         tgt = sys.argv[1]
