@@ -28,4 +28,8 @@ We will not try to improve this implementation. But if you find any bug, please 
     
     print "8 -- Single stranger influence test on MovieLens "
     
-    print "99 -- Show FMT dataset information" 
+    print "99 -- Show FMT dataset information"
+
+2. Required packages:
+   
+   numpy, pickle 

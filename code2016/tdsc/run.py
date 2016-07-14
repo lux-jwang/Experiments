@@ -1,5 +1,5 @@
 # author: jun.wang (at) uni.lu
-# We will not try improve this implementation. But if you find any bug, please feel free to contact me.
+# We will not try to improve this implementation. But if you find any bug, please feel free to contact me.
 
 import sys
 import datetime
@@ -7,8 +7,6 @@ from os import path
 from random import shuffle
 import numpy as np
 import pickle
-from scipy import stats
-import matplotlib.pyplot as plt
 
 sys.path.append("./src")
 from models import Model, FriendsModel
