@@ -27,6 +27,8 @@ class EsoricsPredictor(Predictor):
     def predict_by_friends(self, user_id, item_id):
         ru  = self.model.get_user_rate_mean(user_id)
         fs = self.contributors.get_rand_friends(user_id)
+        if fs is None:
+            return 0
         fnb_delta = self.get_delta(fs,item_id)
         pref = ru+fnb_delta
         return pref
@@ -35,6 +37,8 @@ class EsoricsPredictor(Predictor):
         ru  = self.model.get_user_rate_mean(user_id)
         #ts = self.contributors.get_fof_as_strangers(user_id); # use fof as stranger, this is for simulating decentralized version
         ts = self.contributors.get_rand_strangers(user_id)
+        if ts is None:
+            return 0
         tnb_delta  = self.get_delta(ts,item_id)
         pref = ru+tnb_delta
 

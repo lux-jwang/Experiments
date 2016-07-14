@@ -104,6 +104,9 @@ class Friends_Strangers(Contributors):
         return (fnbs, stnbs)
 
     def get_rand_friends(self, user_id):
+        if self.f_n < 1:
+            return None
+
         if user_id in self.friends:
             return self.friends[user_id]
 
@@ -118,6 +121,9 @@ class Friends_Strangers(Contributors):
         return fnbs
 
     def get_rand_strangers(self, user_id):
+        if self.t_n < 1:
+            return None
+        
         if user_id in self.strangers:
             return self.strangers[user_id]
 
