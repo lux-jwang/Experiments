@@ -7,6 +7,8 @@ raw_data: 2-d dict
 class Model(object):
     def __init__(self,raw_data):
         self.build_model(raw_data)
+        #self.map_user_item_id_no()
+
         
         return
 
@@ -59,7 +61,6 @@ class Model(object):
                 rate, ts = self.raw_data[user_id][ky]
                 rates[ky] = float(rate)
             return rates
-
 
     def get_rate(self, user_id, item_id, ts=True):
         if not user_id in self.raw_data:
@@ -118,7 +119,8 @@ class Model(object):
         self.users_mean_rate = {}
         self.items_mean_rate = {}
         self.user_id_to_no = {}
-        self.item_id_to_no = {}      
+        self.item_id_to_no = {}
+        self.densecache = {}   
         return
 
     #output: [1,2,3]
@@ -198,6 +200,24 @@ class Model(object):
                 self.data_mat[user_no, item_no] = rate
         #print self.data_mat
         return self.data_mat
+
+    def get_dense_user_vector(self,user_id):
+        if user_id in self.densecache:
+            return self.densecache[user_id]
+
+        item_num = self.get_item_num()
+        #vec = np.zeros(shape=(item_num,1))
+        vec= [0] * item_num
+
+        for item_no, item_id in enumerate(self.get_item_ids()):
+            if item_id in self.raw_data[user_id]:
+                rate, _ = self.raw_data[user_id][item_id]
+                vec[item_no] = rate
+                #print rate
+        self.densecache[user_id] = vec
+
+        return vec
+
 
 
 

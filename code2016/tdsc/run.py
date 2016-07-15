@@ -3,7 +3,7 @@
 
 import sys
 import datetime
-from os import path
+from os import path, makedirs
 from random import shuffle
 import numpy as np
 import pickle
@@ -19,6 +19,8 @@ from evaluators import GlobalJaccardKfold,FriendsJaccardKfold,FriendsCosineKfold
                        GlobalReputationKfold, FriendStrangerKfold,\
                        JphKfold, EsoricsSingleUserValidation
 from evaluators import root_mean_square_error, mean_absolute_error
+
+from predictors import Friends_Strangers
 
 
 def get_friends_from_ml100k():
@@ -102,11 +104,11 @@ def calculate_cosine_friends_strangers(raw_data,friend_data, f_t_shape):
 
 def single_influence(raw_data, friend_data,testfriend,filename):
     if testfriend:
-        f_ns = [11, 31] # randomly remove on when selecting friends
+        f_ns = [11, 31] # randomly remove one when selecting friends
         t_n = 10
     else:
         f_ns = [10, 30]
-        t_n = 11 # randomly remove on when selecting strangers
+        t_n = 11 # randomly remove one when selecting strangers
 
     ratio = 0.8
     for f_n in f_ns:
@@ -127,7 +129,7 @@ def jhk_friends(raw_data, friend_data, f_s):
        print ">> mean: ", round(mean_rs,4), "; max diverse: ", round(bound,4), "; STD: ", round(mae_std,4), "; max MAE, ", round(max_mae,4), "; min MAE: ", round(min_mae,4)
 
 def pure_single_friend_influence(raw_data, friend_data, filename):
-    f_ns = [6, 11,21,31,41,51]
+    f_ns = [3,6,11] #will randomly exclude one
     t_n= 0
     ratio = 1
     for f_n in f_ns:
@@ -136,6 +138,55 @@ def pure_single_friend_influence(raw_data, friend_data, filename):
         results = esvlidation.cross_validate()
         tname = filename+str(f_n)
         np.savetxt(tname, results, delimiter=',')
+
+def save_list_to_file(filename, ldat):
+    np.savetxt(filename,ldat,fmt="%d")
+
+    #with open(filename, 'w') as f:  
+    #    f.writelines("%s\n" % l for l in ldat)
+
+def generate_simulating_data(raw_data,friend_data, user_id, f_num, t_num,filelocation):
+
+    if not user_id in friend_data:
+        print "invalid user_id!"
+        return
+
+    if not path.exists(filelocation):
+        makedirs(filelocation)
+
+    friend_model = FriendsModel(raw_data,friend_data)
+    cosine_sim = CosineSimilarity(friend_model)
+    fs = Friends_Strangers(cosine_sim, f_num, t_num)
+    friends = fs.get_rand_friends(user_id)
+    strangers = fs.get_rand_strangers(user_id)
+    f_ids, f_sims = zip(*friends)
+    t_ids, _ = zip(*strangers)
+
+    f_sims = np.dot(f_sims,8).astype(np.int32).tolist() #for HE
+    print f_sims
+    f1 = filelocation+"similarity_"+user_id+"_"+str(f_num)+".dat"
+    save_list_to_file(f1, [f_sims]) #friends similarity 
+
+    diskfriend = []
+    for f_id in f_ids:
+        vec = friend_model.get_dense_user_vector(f_id)
+        vec = np.dot(vec,16).astype(np.int32).tolist()#for HE
+        #vec.tolist()
+        diskfriend.append(vec)
+    f2 = filelocation+"friend_"+user_id+"_"+str(f_num)+".dat"
+    save_list_to_file(f2, diskfriend) #friends rating data
+
+
+    diskstranger = []
+    t_ids, __ = zip(*strangers)
+
+    for t_id in t_ids:
+        vec = friend_model.get_dense_user_vector(f_id)
+        vec = np.dot(vec,16).astype(np.int32).tolist() #for HE
+        diskstranger.append(vec)
+    f3 = filelocation+"stranger_"+user_id+"_"+str(t_num)+".dat"
+    save_list_to_file(f3, diskstranger) #friends rating data
+
 
 
 def Pure_Friend_Influence_on_10_FMT():
@@ -198,6 +249,51 @@ def JPH_on_MovieLens():
     raw_data = get_moive100k()
     jhk_friends(raw_data, friend_data, f_s)
 
+def Generate_Simulating_Data_on_MovieLens(user_id,f_num, t_num):
+    friend_data = get_friends_from_ml100k()
+    raw_data = get_moive100k()
+    friend_model = FriendsModel(raw_data,friend_data)
+    cosine_sim = CosineSimilarity(friend_model)
+    fs = Friends_Strangers(cosine_sim, f_num, t_num)
+    friends = fs.get_rand_friends(user_id)
+    strangers = fs.get_rand_strangers(user_id)
+
+def Generate_Simulating_Data_on_10_FMT(user_id):
+    filelocation = "./FMT10/"
+    friend_data = get_friends_data()
+    raw_data = get_user_item_matrix()
+    generate_simulating_data(raw_data,friend_data,user_id,30,10,filelocation)
+
+
+def Generate_Simulating_Data_on_MovieLens(user_id):
+    user_id = int(user_id)
+
+    filelocation = "./ML100K/"
+    friend_data = get_friends_from_ml100k()
+    raw_data = get_moive100k()
+    generate_simulating_data(raw_data,friend_data,user_id,70,10,filelocation)
+
+def Show_Users_on_10_FMT():
+    indx = 0
+    friend_data = get_friends_data()
+    for ky in friend_data:
+        print ky
+        indx += 1
+        if indx > 20:
+            break
+    print "..."
+
+def Show_Users_on_MovieLens():
+    indx = 0
+    friend_data = get_friends_from_ml100k()
+    for ky in friend_data:
+        print ky
+        indx += 1
+        if indx > 20:
+            break
+    print "..."
+
+
 def Show_Data_Info():
     print "Location: >>"
     print "    FMT original files: ./src/dataset/expdata. "
@@ -228,6 +324,10 @@ def note():
     print "8 -- Single stranger influence test on MovieLens "
     print "9 -- Single friend influence without involving any stranger on 10-FMT"
     print "10 -- Single friend influence without involving any stranger on MovieLens"
+    print "11 -- Create protocol similation files from 10-FMT. You should input user_id (FMT is twitter ID)"
+    print "12 -- Create protocol similation files from MovieLens. You should input user_id (FMT is twitter ID)"
+    print "13 -- show a number of user ids of FMT"
+    print "14 -- show a number of user ids of MovieLens"
     print "99 -- Show FMT dataset information"
 
 def nllfunc():
@@ -239,7 +339,6 @@ if __name__ == '__main__':
 
     if len(sys.argv) < 2:
         note()
-
     else:
         tasks = {"0": nllfunc, #construct_data_set
                  "1": MAE_on_10_FMT,
@@ -252,7 +351,11 @@ if __name__ == '__main__':
                  "8": Single_Stranger_Influence_on_MovieLens,
                  "9": Pure_Friend_Influence_on_10_FMT,
                  "10": Pure_Friend_Influence_on_MovieLens,
-                 "99": Show_Data_Info,
+                 "11": Generate_Simulating_Data_on_10_FMT,
+                 "12": Generate_Simulating_Data_on_MovieLens,
+                 "13": Show_Users_on_10_FMT,
+                 "14": Show_Users_on_MovieLens,
+                 "99": Show_Data_Info
         }
 
         tgt = sys.argv[1]
@@ -272,7 +375,11 @@ if __name__ == '__main__':
                 print "New generated data files are located at: ./src/dataset/mid_data "
                 print "Note: For faster IO, we save the data as binary format. The ratings are scaled to [0,5]."
                 print "The original ASCII format files of FMT are located at: ./src/dataset/expdata"
-
+            elif tgt == '11' or tgt == '12':
+                if len(sys.argv) < 3:
+                    print "Did you input the user_id? "
+                else:
+                    user_id = sys.argv[2]
+                    tasks[tgt](user_id)
             else:
                 tasks[tgt]()
-
