@@ -1,5 +1,7 @@
 1. This data set is built based on MovieTweetings dataset: https://github.com/sidooms/MovieTweetings.
 2. We crawled the friends information for each user in MovieTweetings dataset since it does not have.
+3. In this data set (10-FMT) , we filter the FMT dataset by each user has at least 10 ratings and at least 10 friends.
+
 
 There are three files in the dataset: ratings.dat, users.dat, friends.dat.
 
