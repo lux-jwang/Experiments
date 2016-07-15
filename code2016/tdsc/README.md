@@ -31,6 +31,14 @@ We will not try to improve this implementation. But if you find any bug, please 
     print "9 -- Single friend influence without involving any stranger on 10-FMT"
 
     print "10 -- Single friend influence without involving any stranger on MovieLens"
+
+    print "11 -- Create protocol similation files from 10-FMT. You should input user_id (FMT is twitter ID)"
+
+    print "12 -- Create protocol similation files from MovieLens. You should input user_id (FMT is twitter ID)"
+
+    print "13 -- show a number of user ids of FMT"
+    
+    print "14 -- show a number of user ids of MovieLens"
     
     print "99 -- Show FMT dataset information"
 
