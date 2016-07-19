@@ -10,9 +10,9 @@ tdsc/ --
       
       +-- cryptonbm/ % cryto verion of single prediction protocol and top-N protocol implemented
 
-fmt/  --            % TweetMovies dataset with friend information, each user at least has 1 friend and 1 rating
+fmt/  --    % TweetMovies dataset with friend information, each user at least has 1 friend and 1 rating
 
-10fmt/--            % Based on fmt, each user at least has 10 friends
+10fmt/--    % Based on fmt, each user at least has 10 friends
        
       
 
