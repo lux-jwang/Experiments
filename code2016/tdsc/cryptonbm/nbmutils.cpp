@@ -41,9 +41,9 @@ Worker *Worker::s_pInstance=0;
 void Worker::build_he_params()
 {
 	//EncryptionParameters m_parms;
-	m_parms.poly_modulus() = "1x^2048 + 1";
-	m_parms.coeff_modulus() = ChooserEvaluator::default_parameter_options().at(2048);
-	m_parms.plain_modulus() = 1 << 8;
+	m_parms.poly_modulus() = "1x^4096 + 1";
+	m_parms.coeff_modulus() = ChooserEvaluator::default_parameter_options().at(4096);
+	m_parms.plain_modulus() = 1 << 12;
 	cout << "Encryption parameters specify " << m_parms.poly_modulus().significant_coeff_count() << " coefficients with "
         << m_parms.coeff_modulus().significant_bit_count() << " bits per coefficient" << endl;
 }
@@ -137,8 +137,6 @@ BIGPOLYARRAY sub_p(BIGPOLYARRAY a, BIGPOLY b)
 #endif
 }
 
-
-
 BIGPOLY init_bigpoly(int val)
 {
 #ifdef SIM
@@ -192,12 +190,24 @@ int get_plain_int(BIGPOLYARRAY a)
 
 void init_bigpoly_vec(int *pVec, BIGPOLY *pBpvec, int item_size)
 {
-	if(NULL == pBpvec || NULL == pVec){return;
+	if(NULL == pBpvec || NULL == pVec){
+		return;
     }
-   
+
+    BIGPOLY init_zero_p = init_bigpoly(0);
+    BIGPOLY init_one_p = init_bigpoly(1); //for binary vector this is useful
     for(int indx=0; indx<item_size; indx++)
     {
-		pBpvec[indx] = init_bigpoly(pVec[indx]);
+    	if(pVec[indx] == 0){
+    		pBpvec[indx] = init_zero_p;
+
+    	}else if(pVec[indx] == 1)
+    	{
+    		pBpvec[indx] = init_one_p;
+    	}else
+    	{
+    		pBpvec[indx] = init_bigpoly(pVec[indx]);
+    	}	
 	}
 }
 
@@ -205,18 +215,18 @@ void enc_bigpoly_vec(BIGPOLY *pBpvec, BIGPOLYARRAY *pBpavec, int item_size)
 {
 	if(NULL == pBpvec || NULL == pBpavec){return;
     }
-
-    BIGPOLYARRAY init_zero = enc_bigpoly(init_bigpoly(0));
    
     for(int indx=0; indx<item_size; indx++)
     {
-		pBpavec[indx] = ADD_P(init_zero,pBpvec[indx]); // Experimentally, this is faster than enc_bigpoly(..), not know the reason.
-		//enc_bigpoly(pBpvec[indx]);
+		pBpavec[indx] = enc_bigpoly(pBpvec[indx]);
 	}
 }
 
 //make sure that initialize sum_v to 0!!!!!!!!!!!!!!!!!!!!!!
 //for speed
+//This function is only used by server!!!!!! or may arise security issues.
+//Be aware of this!!!!!!!
+
 BIGPOLYARRAY sum_vector(BIGPOLYARRAY *pBpavec, int item_size, BIGPOLYARRAY  sum_v) //
 {
     //BIGPOLYARRAY sum_v = enc_bigpoly(init_bigpoly(0));

@@ -44,8 +44,7 @@ void perform_topn_friend(CSTMARK int *pRf, CSTMARK BIGPOLYARRAY wuf, BIGPOLYARRA
    if(NULL == pRf || NULL == pIb || NULL == pBias){
 		return;
 	}
-	//BIGPOLYARRAY init_zero = enc_bigpoly(init_bigpoly(0));
-	//BIGPOLYARRAY init_one = enc_bigpoly(init_bigpoly(1)); // can not
+
 	BIGPOLY init_one_p = init_bigpoly(1);
 	BIGPOLY init_zero_p = init_bigpoly(0);
  
@@ -78,9 +77,6 @@ void perform_topn_server(CSTMARK BIGPOLYARRAY **pFs, CSTMARK BIGPOLYARRAY **pTs,
 	if(NULL==pFs || NULL==pTs || NULL==pQFs || NULL==pQTs || NULL==pXu || NULL==pYu){
 		return;
 	}
-
-	//BIGPOLYARRAY *pXu = new BIGPOLYARRAY[item_size]; //output the result, it's good for testing without affecting the logical
-	//BIGPOLYARRAY *pYu = new BIGPOLYARRAY[item_size];
 
 	BIGPOLY ab = init_bigpoly(alpha+beta); //alpha+beta === 10;
 	BIGPOLY bp_alpha = init_bigpoly(alpha); 
@@ -123,9 +119,6 @@ void perform_topn_server(CSTMARK BIGPOLYARRAY **pFs, CSTMARK BIGPOLYARRAY **pTs,
     /*
      * Rank results
     **/
-
-     //delete[] pXu;
-     //delete[] pYu;
 }
 
 void perform_topn(UID u_id, int f_num=70, int t_num=10, int item_size=1682)
