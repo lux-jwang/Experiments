@@ -40,8 +40,7 @@ void perform_spp_stranger(CSTMARK BIGPOLYARRAY *pIb, CSTMARK int *pRt, int item_
     	}
 
     	qtb = ADD_C(tmp,qtb);  //2*qt ?
-    }
-    
+    }    
     delete[] pBias;
 }
 
@@ -97,7 +96,6 @@ void perform_spp(UID u_id, int *pTgt, int tgt_size, int f_num=70, int t_num=10, 
 	BIGPOLY ab = init_bigpoly(10); //alpha+beta === 10;
 	BIGPOLY bp_alpha = init_bigpoly(8); 
 	BIGPOLY bp_beta = init_bigpoly(2);
-	BIGPOLYARRAY init_zero = enc_bigpoly(init_bigpoly(0));
 
 	BIGPOLYARRAY *pTs = new BIGPOLYARRAY[t_num];
 	BIGPOLYARRAY *pFs = new BIGPOLYARRAY[f_num];
@@ -110,18 +108,21 @@ void perform_spp(UID u_id, int *pTgt, int tgt_size, int f_num=70, int t_num=10, 
 
 
 	int *pIb = new int[item_size]();
+	BIGPOLY init_one_p = init_bigpoly(1); 
+
 	clock_t begin_time = clock();
+
 	init_bigpoly_vec(pIb,pBvec,item_size);
-	//cout<<"start spp 10..."<<endl;
 	enc_bigpoly_vec(pBvec,pBavec, item_size);
 	init_bigpoly_vec(pUsim,pUvec,f_num);
 	enc_bigpoly_vec(pUvec,pUavec, f_num);
-	//cout<<"start spp 2..."<<endl;
+
 	cout <<"user stage >> u_id: "<<u_id<<"->  "<<  setprecision(5)<<float(clock ()-begin_time )/CLOCKS_PER_SEC <<" seconds" <<endl;
+	
 	
 	for(int tidx=0; tidx<tgt_size; tidx++)
 	{ 
-		pBavec[pTgt[tidx]] = enc_bigpoly(init_bigpoly(1));
+		pBavec[pTgt[tidx]] = enc_bigpoly(init_one_p);
 
 		begin_time = clock();
 		for(int indx=0; indx<t_num; indx++)
@@ -141,7 +142,6 @@ void perform_spp(UID u_id, int *pTgt, int tgt_size, int f_num=70, int t_num=10, 
 	       BIGPOLYARRAY rib;
 	       BIGPOLYARRAY qb;
 		   perform_spp_friend(pBavec, pFdata[indx], pUavec[indx], item_size, rib, qb);
-
 		   //cout<<"f: rib: "<<get_plain_int(rib)<<"qb: "<< get_plain_int(qb)<<endl;
 		   pFs[indx] = rib;
 		   pQFs[indx] = qb;
@@ -156,7 +156,7 @@ void perform_spp(UID u_id, int *pTgt, int tgt_size, int f_num=70, int t_num=10, 
 	    cout <<"server stage >> u_id: "<<u_id<<" predict: "<<pTgt[tidx]<<"->  "<< setprecision(5)<<float(clock ()-begin_time )/CLOCKS_PER_SEC <<" seconds" <<endl;
 
 	    //reset
-	    pBavec[pTgt[tidx]]  = init_zero;
+	    pBavec[pTgt[tidx]]  = enc_bigpoly(init_bigpoly(0));
 
 	}
 
