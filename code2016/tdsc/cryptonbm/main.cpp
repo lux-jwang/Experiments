@@ -29,7 +29,7 @@ int main ( int argc, char *argv[] )
 		    int randtgt[3] = {0};
             for(int indx=0; indx<3; indx++)
             {
-    	        srand(time(NULL));
+    	        srand(time(NULL)+indx);
 	            randtgt[indx] = std::rand()%item_size; //randomly predict one item for u_id
             }
 		    cout<<"start spp ..."<<endl;	    
