@@ -1,5 +1,5 @@
 
-%%  Split data 2: totally excludes some user profile from traing set 
+%%   Differentially private NBM - SGD
 %   created by jun wang
 %   jun.wang@uni.lu
 %%  configuration
